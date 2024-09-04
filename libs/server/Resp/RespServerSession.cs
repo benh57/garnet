@@ -683,6 +683,13 @@ namespace Garnet.server
             }
             else if (command == RespCommand.CLIENT_SETNAME)
             {
+                if (parseState.Count != 1)
+                {
+                    return AbortWithWrongNumberOfArguments($"{nameof(RespCommand.CLIENT)}|{nameof(CmdStrings.SETNAME)}");
+                }
+
+                this.clientName = parseState.GetString(0);
+
                 while (!RespWriteUtils.WriteDirect(CmdStrings.RESP_OK, ref dcurr, dend))
                     SendAndReset();
             }
