@@ -14,6 +14,7 @@ namespace Garnet.server
         /// Request strings
         /// </summary>
         public static ReadOnlySpan<byte> CLIENT => "CLIENT"u8;
+        public static ReadOnlySpan<byte> ID => "ID"u8;
         public static ReadOnlySpan<byte> SUBSCRIBE => "SUBSCRIBE"u8;
         public static ReadOnlySpan<byte> RUNTXP => "RUNTXP"u8;
         public static ReadOnlySpan<byte> GET => "GET"u8;
@@ -31,6 +32,7 @@ namespace Garnet.server
         public static ReadOnlySpan<byte> ACL => "ACL"u8;
         public static ReadOnlySpan<byte> AUTH => "AUTH"u8;
         public static ReadOnlySpan<byte> auth => "auth"u8;
+        public static ReadOnlySpan<byte> GETNAME => "GETNAME"u8;
         public static ReadOnlySpan<byte> SETNAME => "SETNAME"u8;
         public static ReadOnlySpan<byte> INFO => "INFO"u8;
         public static ReadOnlySpan<byte> info => "info"u8;

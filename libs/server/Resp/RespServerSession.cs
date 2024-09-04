@@ -666,7 +666,22 @@ namespace Garnet.server
         private bool ProcessOtherCommands<TGarnetApi>(RespCommand command, ref TGarnetApi storageApi)
             where TGarnetApi : IGarnetApi
         {
-            if (command == RespCommand.CLIENT)
+            if (command == RespCommand.CLIENT_ID)
+            {
+                while (!RespWriteUtils.WriteInteger(43, ref dcurr, dend))
+                    SendAndReset();
+            }
+            if (command == RespCommand.CLIENT_INFO)
+            {
+                while (!RespWriteUtils.WriteInteger(43, ref dcurr, dend))
+                    SendAndReset();
+            }
+            else if (command == RespCommand.CLIENT_GETNAME)
+            {
+                while (!RespWriteUtils.WriteAsciiBulkString(this.clientName, ref dcurr, dend))
+                    SendAndReset();
+            }
+            else if (command == RespCommand.CLIENT_SETNAME)
             {
                 while (!RespWriteUtils.WriteDirect(CmdStrings.RESP_OK, ref dcurr, dend))
                     SendAndReset();

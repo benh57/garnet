@@ -166,7 +166,13 @@ namespace Garnet.server
         ASKING,
         SELECT,
         ECHO,
+
         CLIENT,
+        CLIENT_ID,
+        CLIENT_INFO,
+        CLIENT_LIST,
+        CLIENT_GETNAME,
+        CLIENT_SETNAME,
 
         MONITOR,
         MODULE,
@@ -315,6 +321,13 @@ namespace Garnet.server
             RespCommand.ACL_SETUSER,
             RespCommand.ACL_USERS,
             RespCommand.ACL_WHOAMI,
+            // Client
+            RespCommand.CLIENT,
+            RespCommand.CLIENT_ID,
+            RespCommand.CLIENT_INFO,
+            RespCommand.CLIENT_LIST,
+            RespCommand.CLIENT_GETNAME,
+            RespCommand.CLIENT_SETNAME,
             // Command
             RespCommand.COMMAND,
             RespCommand.COMMAND_COUNT,
@@ -1467,7 +1480,45 @@ namespace Garnet.server
             }
             else if (command.SequenceEqual(CmdStrings.CLIENT))
             {
-                return RespCommand.CLIENT;
+                if (count == 0)
+                {
+                    specificErrorMsg = Encoding.ASCII.GetBytes(string.Format(CmdStrings.GenericErrWrongNumArgs,
+                        nameof(RespCommand.CLIENT)));
+                }
+                else if (count >= 1)
+                {
+                    Span<byte> subCommand = GetCommand(out bool gotSubCommand);
+                    if (!gotSubCommand)
+                    {
+                        success = false;
+                        return RespCommand.NONE;
+                    }
+
+                    AsciiUtils.ToUpperInPlace(subCommand);
+
+                    count--;
+
+                    if (subCommand.SequenceEqual(CmdStrings.ID))
+                    {
+                        return RespCommand.CLIENT_ID;
+                    }
+                    else if (subCommand.SequenceEqual(CmdStrings.INFO))
+                    {
+                        return RespCommand.CLIENT_INFO;
+                    }
+                    else if (subCommand.SequenceEqual(CmdStrings.GETNAME))
+                    {
+                        return RespCommand.CLIENT_GETNAME;
+                    }
+                    else if (subCommand.SequenceEqual(CmdStrings.SETNAME))
+                    {
+                        return RespCommand.CLIENT_SETNAME;
+                    }
+                    else if (subCommand.SequenceEqual(CmdStrings.LIST))
+                    {
+                        return RespCommand.CLIENT_LIST;
+                    }
+                }
             }
             else if (command.SequenceEqual(CmdStrings.AUTH))
             {
