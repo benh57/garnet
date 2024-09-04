@@ -3,7 +3,9 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -14,6 +16,7 @@ using Garnet.networking;
 using Garnet.server.ACL;
 using Garnet.server.Auth;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Tsavorite.core;
 
 namespace Garnet.server
@@ -668,12 +671,40 @@ namespace Garnet.server
         {
             if (command == RespCommand.CLIENT_ID)
             {
-                while (!RespWriteUtils.WriteInteger(43, ref dcurr, dend))
+                while (!RespWriteUtils.WriteInteger(this.StoreSessionID, ref dcurr, dend))
                     SendAndReset();
             }
             if (command == RespCommand.CLIENT_INFO)
             {
-                while (!RespWriteUtils.WriteInteger(43, ref dcurr, dend))
+                var infoFields = new Dictionary<string, object>
+                {
+                    { "id", this.StoreSessionID },
+                    { "addr", "0.0.0.0/0" },
+                    { "laddr", "0.0.0.0/0" },
+                    { "fd", "0" },
+                    { "name", this.clientName },
+                    { "age", 3369 },
+                    { "idle", 0 },
+                    { "flags", "N" },
+                    { "db", 0 },
+                    { "sub", 0 },
+                    { "psub", 0 },
+                    { "multi", -1 },
+                    { "qbuf", 26 },
+                    { "qbuf-free", 40928 },
+                    { "argv-mem", 10 },
+                    { "obl", 0 },
+                    { "oll", 0 },
+                    { "omem", 0 },
+                    { "tot-mem", 61466 },
+                    { "events", "r" },
+                    { "cmd", $"{command}"},
+                    { "user", "default" },
+                    { "redir", -1 }
+                };
+
+                string infoString = string.Join(" ", infoFields.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+                while (!RespWriteUtils.WriteAsciiBulkString(infoString, ref dcurr, dend))
                     SendAndReset();
             }
             else if (command == RespCommand.CLIENT_GETNAME)
